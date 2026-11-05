@@ -1,0 +1,6 @@
+# Maxfiy sozlamalar: faqat hostingda turadi
+order-config.php
+
+.DS_Store
+Thumbs.db
+*.zip

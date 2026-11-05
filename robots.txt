@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /cart.html
+Disallow: /order.php
+
+Sitemap: https://asama.uz/sitemap.xml

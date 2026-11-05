@@ -160,7 +160,7 @@
         '</a>' +
         '<nav class="main-nav" id="main-nav">' + nav + '</nav>' +
         '<div class="header-actions">' +
-          '<a class="header-phone" href="tel:' + esc(CFG.phoneLink) + '">' + esc(CFG.phone) + '</a>' +
+          phoneLink('header-phone') +
           '<div class="lang-switch" role="group" aria-label="Til / Язык">' + langs + '</div>' +
           '<a class="cart-link" href="cart.html" aria-label="' + esc(t('nav.cart')) + '"' + (page === 'cart' ? ' aria-current="page"' : '') + '>' +
             '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3" fill="currentColor"/><circle cx="17.5" cy="20.5" r="1.3" fill="currentColor"/></svg>' +
@@ -180,11 +180,18 @@
     });
   }
 
+  /** Qo'ng'iroq tugmasi. config.js da telefon bo'sh bo'lsa, hech narsa chizilmaydi. */
+  function phoneLink(cls, label) {
+    if (!CFG.phone) return '';
+    return '<a class="' + cls + '" href="tel:' + esc(CFG.phoneLink) + '">' + esc(label || CFG.phone) + '</a>';
+  }
+
   function contactList() {
     var items = [];
-    var phones = '<a href="tel:' + esc(CFG.phoneLink) + '">' + esc(CFG.phone) + '</a>';
-    if (CFG.phone2) phones += '<br><a href="tel:' + esc(CFG.phone2Link) + '">' + esc(CFG.phone2) + '</a>';
-    items.push([t('contact.phone'), phones]);
+    var phones = [];
+    if (CFG.phone) phones.push('<a href="tel:' + esc(CFG.phoneLink) + '">' + esc(CFG.phone) + '</a>');
+    if (CFG.phone2) phones.push('<a href="tel:' + esc(CFG.phone2Link) + '">' + esc(CFG.phone2) + '</a>');
+    if (phones.length) items.push([t('contact.phone'), phones.join('<br>')]);
     if (CFG.telegram) items.push([t('contact.telegram'), '<a href="' + esc(telegramUrl()) + '" target="_blank" rel="noopener">@' + esc(CFG.telegram) + '</a>']);
     if (CFG.instagram) items.push([t('contact.instagram'), '<a href="https://instagram.com/' + esc(encodeURIComponent(CFG.instagram)) + '" target="_blank" rel="noopener">@' + esc(CFG.instagram) + '</a>']);
     var addr = esc(lang === 'ru' ? CFG.addressRu : CFG.addressUz);
@@ -278,26 +285,28 @@
       '<section class="hero"><div class="container hero-inner">' +
         '<div class="hero-text"><h1>' + esc(t('hero.title')) + '</h1><p>' + esc(t('hero.text')) + '</p>' +
           '<div class="hero-buttons"><a class="btn btn-accent" href="catalog.html">' + esc(t('hero.catalog')) + '</a>' +
-          '<a class="btn btn-outline-light" href="tel:' + esc(CFG.phoneLink) + '">' + esc(t('hero.call')) + '</a></div></div>' +
+          phoneLink('btn btn-outline-light', t('hero.call')) + '</div></div>' +
         '<div class="hero-art" aria-hidden="true"><img src="assets/img/cat-radiators.svg" alt=""><img src="assets/img/cat-boilers.svg" alt=""><img src="assets/img/cat-valves.svg" alt=""></div>' +
       '</div></section>' +
       '<section class="container section"><h2>' + esc(t('home.categories')) + '</h2><div class="cat-grid">' + cats + '</div></section>' +
       '<section class="container section"><div class="section-head"><h2>' + esc(t('home.featured')) + '</h2><a href="catalog.html">' + esc(t('home.allProducts')) + '</a></div>' +
         '<div class="product-grid">' + featured + '</div></section>' +
       '<section class="section why"><div class="container"><h2>' + esc(t('home.why')) + '</h2><div class="why-grid">' + why + '</div></div></section>' +
-      '<section class="container section"><div class="cta"><div><h2>' + esc(t('home.ctaTitle')) + '</h2><p>' + esc(t('home.ctaText')) + '</p></div>' +
-        '<div class="cta-buttons"><a class="btn btn-accent" href="tel:' + esc(CFG.phoneLink) + '">' + esc(CFG.phone) + '</a>' + tg + '</div></div></section>';
+      // Telefon ham, Telegram ham bo'lmasa, "Bog'laning" bloki ko'rsatilmaydi
+      (CFG.phone || tg ? '<section class="container section"><div class="cta"><div><h2>' + esc(t('home.ctaTitle')) + '</h2><p>' + esc(t('home.ctaText')) + '</p></div>' +
+        '<div class="cta-buttons">' + phoneLink('btn btn-accent') + tg + '</div></div></section>' : '');
     bindAddButtons(app);
-    addJsonLd('store-jsonld', {
+    var store = {
       '@context': 'https://schema.org',
       '@type': 'HardwareStore',
       name: CFG.name,
       description: t('hero.text'),
       url: location.origin + '/',
-      telephone: CFG.phoneLink,
       address: lang === 'ru' ? CFG.addressRu : CFG.addressUz,
       priceRange: '$$',
-    });
+    };
+    if (CFG.phone) store.telephone = CFG.phoneLink;
+    addJsonLd('store-jsonld', store);
   }
 
   function addJsonLd(id, data) {
@@ -634,7 +643,7 @@
       '<textarea readonly rows="8">' + esc(text) + '</textarea>' +
       '<div class="fallback-buttons"><button type="button" class="btn btn-primary" id="copy-order">' + esc(t('order.copy')) + '</button>' +
       (CFG.telegram ? '<a class="btn btn-light" href="' + esc(telegramUrl()) + '" target="_blank" rel="noopener">' + esc(t('order.sendTelegram')) + '</a>' : '') +
-      '<a class="btn btn-light" href="tel:' + esc(CFG.phoneLink) + '">' + esc(CFG.phone) + '</a></div>';
+      phoneLink('btn btn-light') + '</div>';
     $('#order-form').appendChild(box);
     box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
@@ -659,7 +668,7 @@
         '<div class="about-grid">' +
           '<div class="prose"><p>' + esc(t('about.p1')) + '</p><p>' + esc(t('about.p2')) + '</p></div>' +
           '<div class="contact-card" id="contact"><h2>' + esc(t('contact.title')) + '</h2>' + contactList() +
-            '<div class="cta-buttons"><a class="btn btn-accent" href="tel:' + esc(CFG.phoneLink) + '">' + esc(t('hero.call')) + '</a>' + tg + '</div></div>' +
+            '<div class="cta-buttons">' + phoneLink('btn btn-accent', t('hero.call')) + tg + '</div></div>' +
         '</div>' +
       '</div>';
   }

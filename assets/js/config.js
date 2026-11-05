@@ -7,14 +7,15 @@ window.SITE_CONFIG = {
   sloganUz: 'Santexnika va isitish uskunalari',
   sloganRu: 'Сантехника и отопительное оборудование',
 
+  // Hozircha bo'sh: to'ldirilmaguncha telefon tugmalari ko'rinmaydi.
   // Telefon: "phone" ko'rsatish uchun, "phoneLink" qo'ng'iroq havolasi uchun (faqat raqamlar, + bilan)
-  phone: '+998 90 000 00 00',
-  phoneLink: '+998900000000',
+  phone: '',
+  phoneLink: '',
   phone2: '',
   phone2Link: '',
 
   // Telegram username, @ belgisisiz. Bo'sh qoldirsangiz, Telegram tugmasi ko'rinmaydi.
-  telegram: 'asama_uz',
+  telegram: '',
   instagram: '',
 
   addressUz: "Toshkent sh., manzilni kiriting",

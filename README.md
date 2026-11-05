@@ -54,6 +54,10 @@ O'zgartirgandan keyin HTML fayllardagi `?v=1` ni `?v=2` ga o'zgartirsangiz, mijo
 
 `products.js` dagi maydonlar `savdo-erp` dagi mahsulot jadvali bilan bir xil nomlangan (`sku`, `nameUz`, `nameRu`, `categoryId`, `retailPrice`). ERP internetga (VPS) chiqqanda katalog ERP API'dan olinadi, buyurtmalar esa ERP'ga tushadi. Sayt kodining qolgan qismi o'zgarmaydi.
 
+## Sinov uchun ko'rish (GitHub Pages)
+
+`main` branchdagi sayt https://azizjoons97-create.github.io/asama/ manzilida ochiladi va har merge'dan keyin 1–2 daqiqada yangilanadi. GitHub PHP'ni ishga tushirmaydi, shuning uchun bu yerda buyurtma Telegramga bormaydi. Mijozga buyurtma matnini nusxalash taklif qilinadi. `.nojekyll` fayli GitHub'ga fayllarni o'zgartirmasdan joylashni aytadi.
+
 ## Lokal ko'rish
 
 ```bash

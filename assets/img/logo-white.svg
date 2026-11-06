@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 52" fill="none" role="img" aria-label="ASAMA">
+  <!-- Parraklar: chap yarim shaffof oq (2 ta), o'ng to'liq oq (3 ta) -->
+  <g>
+    <polygon points="4,46 13,6 19,6 10,46" fill="rgba(255,255,255,0.6)"/>
+    <polygon points="13,46 22,6 28,6 19,46" fill="rgba(255,255,255,0.6)"/>
+    <polygon points="26,46 35,6 41,6 32,46" fill="#fff"/>
+    <polygon points="35,46 44,6 50,6 41,46" fill="#fff"/>
+    <polygon points="44,46 53,6 59,6 50,46" fill="#fff"/>
+  </g>
+  <text x="70" y="42"
+        font-family="Barlow, 'Arial Narrow', Arial, sans-serif"
+        font-weight="800"
+        font-size="36"
+        letter-spacing="2"
+        fill="#fff">ASAMA</text>
+</svg>

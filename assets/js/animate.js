@@ -98,10 +98,10 @@
       el.setAttribute('data-anim', 'fade-up');
       el.setAttribute('data-delay', (i * 0.06).toFixed(2));
     });
-    // "Nega bizni" bloklari
+    // "Nega bizni" bloklari — kechikish 0.06s gacha qisqartirildi
     document.querySelectorAll('.why-item').forEach(function (el, i) {
       el.setAttribute('data-anim', 'fade-up');
-      el.setAttribute('data-delay', (i * 0.1).toFixed(2));
+      el.setAttribute('data-delay', (i * 0.06).toFixed(2));
     });
     // CTA bloki
     document.querySelectorAll('.cta').forEach(function (el) {
@@ -125,10 +125,10 @@
       el.setAttribute('data-anim', 'fade-up');
       el.setAttribute('data-delay', (i * 0.1).toFixed(2));
     });
-    // H2 sarlavhalar
-    document.querySelectorAll('#app h2:not(.why h2)').forEach(function (el) {
-      if (!el.getAttribute('data-anim')) el.setAttribute('data-anim', 'fade-up');
-    });
+    // H2 sarlavhalar: faqat why, stats blokidagilarga EMAS
+    // Bosh sahifa h2 lari ko'p bo'lib, ba'zilari viewport'da darhol ko'rinadi
+    // Shuning uchun ularni animatsiyasiz qoldiramiz
+    // (category, featured sarlavhalari viewport'da darhol ko'rinyapti)
     // Footer
     document.querySelectorAll('.footer-grid > div').forEach(function (el, i) {
       el.setAttribute('data-anim', 'fade-up');

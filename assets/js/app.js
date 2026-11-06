@@ -162,8 +162,7 @@
     $('#site-header').innerHTML =
       '<div class="container header-inner">' +
         '<a class="logo" href="index.html" aria-label="' + esc(CFG.name) + '">' +
-          '<img src="favicon.svg" alt="" width="36" height="36">' +
-          '<span><strong>' + esc(CFG.name) + '</strong><small>' + esc(lang === 'ru' ? CFG.sloganRu : CFG.sloganUz) + '</small></span>' +
+          '<img src="assets/img/logo.svg" alt="' + esc(CFG.name) + '" height="40" width="200" style="display:block">' +
         '</a>' +
         '<nav class="main-nav" id="main-nav">' + nav + '</nav>' +
         '<div class="header-actions">' +
@@ -216,7 +215,10 @@
     }).join('');
     $('#site-footer').innerHTML =
       '<div class="container footer-grid">' +
-        '<div><div class="footer-logo">' + esc(CFG.name) + '</div><p>' + esc(lang === 'ru' ? CFG.sloganRu : CFG.sloganUz) + '</p></div>' +
+        '<div>' +
+          '<div class="footer-logo"><img src="assets/img/logo-white.svg" alt="' + esc(CFG.name) + '" height="40" width="160" style="display:block;margin-bottom:8px"></div>' +
+          '<p>' + esc(lang === 'ru' ? CFG.sloganRu : CFG.sloganUz) + '</p>' +
+        '</div>' +
         '<div><h3>' + esc(t('nav.catalog')) + '</h3><ul>' + cats + '</ul></div>' +
         '<div><h3>' + esc(t('contact.title')) + '</h3>' + contactList() + '</div>' +
       '</div>' +

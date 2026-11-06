@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0b5fae"/><path d="M32 12c-10 13-14 20-14 27a14 14 0 0 0 28 0c0-7-4-14-14-27z" fill="#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#1A44CC"/>
+  <!-- Qizil parraklar -->
+  <polygon points="6,54 16,10 22,10 12,54" fill="#C0321A"/>
+  <polygon points="16,54 26,10 32,10 22,54" fill="#C0321A"/>
+  <!-- Ko'k (oq) parraklar -->
+  <polygon points="30,54 40,10 46,10 36,54" fill="#fff"/>
+  <polygon points="40,54 50,10 56,10 46,54" fill="#fff"/>
+</svg>

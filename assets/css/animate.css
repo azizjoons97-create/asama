@@ -120,7 +120,7 @@
 }
 .why-item:hover .why-num {
   -webkit-text-stroke-color: var(--accent);
-  color: rgba(248, 103, 7, .12);
+  color: rgba(192, 50, 26, .1);
 }
 
 /* ---------- Hero art rasmlari ---------- */

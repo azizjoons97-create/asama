@@ -159,20 +159,44 @@
       return '<button type="button" data-lang="' + code + '" aria-pressed="' + (code === lang) + '">' + code.toUpperCase() + '</button>';
     }).join('');
 
+    var phoneTop = CFG.phone
+      ? '<a href="tel:' + esc(CFG.phoneLink) + '" class="header-phone-nav">' + esc(CFG.phone) + '</a>'
+      : '';
+    var tgIcon = CFG.telegram
+      ? '<a href="https://t.me/' + esc(encodeURIComponent(CFG.telegram)) + '" class="header-social" target="_blank" rel="noopener" aria-label="Telegram">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-2.038 9.593c-.15.668-.543.832-1.1.517l-3.037-2.237-1.465 1.41c-.162.162-.298.298-.61.298l.217-3.088 5.62-5.073c.244-.217-.053-.337-.378-.12L7.27 14.482l-2.99-.934c-.65-.203-.663-.65.136-.962l11.67-4.502c.542-.196 1.017.12.476.164z"/></svg>' +
+        '</a>'
+      : '';
+
     $('#site-header').innerHTML =
-      '<div class="container header-inner">' +
-        '<a class="logo" href="index.html" aria-label="' + esc(CFG.name) + '">' +
-          '<img src="assets/img/logo.svg" alt="' + esc(CFG.name) + '" height="40" width="200" style="display:block">' +
-        '</a>' +
-        '<nav class="main-nav" id="main-nav">' + nav + '</nav>' +
-        '<div class="header-actions">' +
-          phoneLink('header-phone') +
-          '<div class="lang-switch" role="group" aria-label="Til / Язык">' + langs + '</div>' +
-          '<a class="cart-link" href="cart.html" aria-label="' + esc(t('nav.cart')) + '"' + (page === 'cart' ? ' aria-current="page"' : '') + '>' +
-            '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3" fill="currentColor"/><circle cx="17.5" cy="20.5" r="1.3" fill="currentColor"/></svg>' +
-            '<span class="badge" data-cart-count hidden>0</span>' +
+      '<div class="header-top">' +
+        '<div class="container header-top-inner">' +
+          '<a class="logo" href="index.html" aria-label="' + esc(CFG.name) + '">' +
+            '<img src="assets/img/logo.svg" alt="' + esc(CFG.name) + '" height="42" width="200" style="display:block">' +
           '</a>' +
-          '<button type="button" class="burger" aria-controls="main-nav" aria-expanded="false" aria-label="' + esc(t('nav.menu')) + '"><span></span><span></span><span></span></button>' +
+          '<div class="header-search">' +
+            '<input type="search" id="header-search-input" placeholder="' + esc(t('catalog.search')) + '" aria-label="' + esc(t('catalog.search')) + '">' +
+            '<button type="button" aria-label="Qidiruv">' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>' +
+            '</button>' +
+          '</div>' +
+          '<div class="header-top-right">' +
+            tgIcon +
+            '<div class="lang-switch" role="group" aria-label="Til / Язык">' + langs + '</div>' +
+            '<a class="cart-link" href="cart.html"' + (page === 'cart' ? ' aria-current="page"' : '') + ' aria-label="' + esc(t('nav.cart')) + '">' +
+              '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="17.5" cy="20.5" r="1.3" fill="currentColor" stroke="none"/></svg>' +
+              '<span class="badge" data-cart-count hidden>0</span>' +
+            '</a>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="header-nav-bar">' +
+        '<div class="container header-nav-inner">' +
+          '<nav class="main-nav" id="main-nav">' + nav + '</nav>' +
+          '<div style="display:flex;align-items:center;gap:16px">' +
+            (CFG.phone ? '<span class="header-phone-nav"><a href="tel:' + esc(CFG.phoneLink) + '">' + esc(CFG.phone) + '</a></span>' : '') +
+            '<button type="button" class="burger" aria-controls="main-nav" aria-expanded="false" aria-label="' + esc(t('nav.menu')) + '"><span></span><span></span><span></span></button>' +
+          '</div>' +
         '</div>' +
       '</div>';
 
@@ -184,6 +208,24 @@
       var open = $('#main-nav').classList.toggle('open');
       burger.setAttribute('aria-expanded', String(open));
     });
+
+    // Header qidiruv
+    var searchInput = $('#header-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && searchInput.value.trim()) {
+          location.href = 'catalog.html?q=' + encodeURIComponent(searchInput.value.trim());
+        }
+      });
+      var searchBtn = searchInput.nextElementSibling;
+      if (searchBtn) {
+        searchBtn.addEventListener('click', function () {
+          if (searchInput.value.trim()) {
+            location.href = 'catalog.html?q=' + encodeURIComponent(searchInput.value.trim());
+          }
+        });
+      }
+    }
   }
 
   /** Qo'ng'iroq tugmasi. config.js da telefon bo'sh bo'lsa, hech narsa chizilmaydi. */
@@ -216,7 +258,7 @@
     $('#site-footer').innerHTML =
       '<div class="container footer-grid">' +
         '<div>' +
-          '<div class="footer-logo"><img src="assets/img/logo-white.svg" alt="' + esc(CFG.name) + '" height="40" width="160" style="display:block;margin-bottom:8px"></div>' +
+          '<div class="footer-logo"><img src="assets/img/logo-white.svg" alt="' + esc(CFG.name) + '" height="36" style="display:block;width:auto;max-width:none"></div>' +
           '<p>' + esc(lang === 'ru' ? CFG.sloganRu : CFG.sloganUz) + '</p>' +
         '</div>' +
         '<div><h3>' + esc(t('nav.catalog')) + '</h3><ul>' + cats + '</ul></div>' +
@@ -280,34 +322,161 @@
 
   function pageHome(app) {
     setMeta('', t('hero.text'));
+
+    // Slider ma'lumotlari
+    var slides = [
+      {
+        titleUz: 'Santexnika va isitish uchun hamma narsa bir joyda',
+        titleRu: 'Всё для сантехники и отопления в одном месте',
+        textUz: 'PPR truba va fitinglar, isitish qozonlari, radiatorlar, kranlar va smesitellar.',
+        textRu: 'Трубы и фитинги PPR, котлы, радиаторы, краны и смесители.',
+        img: 'assets/img/cat-radiators.svg',
+        btnUz: 'Katalogni ko\'rish',
+        btnRu: 'Смотреть каталог',
+        btnLink: 'catalog.html',
+      },
+      {
+        titleUz: 'PPR truba va fitinglar',
+        titleRu: 'Трубы и фитинги PPR',
+        textUz: 'PN20 va PN25 bosimli PPR trubalar, barcha o\'lchamlardagi fitinglar. Issiq va sovuq suv uchun.',
+        textRu: 'Трубы PPR PN20 и PN25, фитинги всех размеров. Для горячего и холодного водоснабжения.',
+        img: 'assets/img/cat-pipes.svg',
+        btnUz: 'PPR trubalar',
+        btnRu: 'Трубы PPR',
+        btnLink: 'catalog.html?cat=ppr-pipes',
+      },
+      {
+        titleUz: 'Isitish qozonlari',
+        titleRu: 'Отопительные котлы',
+        textUz: 'Gaz va elektr qozonlari. Kichik xonadan katta binogacha har xil quvvat.',
+        textRu: 'Газовые и электрические котлы. Для небольших комнат и крупных объектов.',
+        img: 'assets/img/cat-boilers.svg',
+        btnUz: 'Qozonlarni ko\'rish',
+        btnRu: 'Смотреть котлы',
+        btnLink: 'catalog.html?cat=boilers',
+      },
+    ];
+
+    var curSlide = 0;
+
+    function slideHtml(i) {
+      var s = slides[i];
+      var title = lang === 'ru' ? s.titleRu : s.titleUz;
+      var text  = lang === 'ru' ? s.textRu  : s.textUz;
+      var btn   = lang === 'ru' ? s.btnRu   : s.btnUz;
+      return '<div class="hero-text" data-slide="' + i + '">' +
+        '<h1>' + esc(title) + '</h1>' +
+        '<p>' + esc(text) + '</p>' +
+        '<div class="hero-buttons">' +
+          '<a class="btn btn-accent" href="' + s.btnLink + '">' + esc(btn) + '</a>' +
+          phoneLink('btn btn-outline-light', t('hero.call')) +
+        '</div>' +
+      '</div>' +
+      '<div class="hero-img">' +
+        '<img src="' + esc(s.img) + '" alt="' + esc(title) + '" width="320" height="280">' +
+      '</div>';
+    }
+
+    function dotsHtml() {
+      return slides.map(function (_, i) {
+        return '<button type="button" class="hero-dot' + (i === curSlide ? ' active' : '') + '" aria-label="Slide ' + (i+1) + '"></button>';
+      }).join('');
+    }
+
+    var advItems = [
+      { iconPath: 'M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z', titleUz: 'Eksklyuziv distributor', titleRu: 'Эксклюзивный дистрибьютор', textUz: "De Dietrich, Caleffi, MADAS va Aquasystem brendlarining O'zbekistondagi rasmiy vakili.", textRu: 'Официальный представитель De Dietrich, Caleffi, MADAS и Aquasystem в Узбекистане.' },
+      { iconPath: 'M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5m-1.414-9.414a2 2 0 1 1 2.828 2.828L11.828 15H9v-2.828l8.586-8.586z', titleUz: 'Rasmiy servis markazi', titleRu: 'Официальный сервис', textUz: "2007 yildan: qozonlar va MAS gaz uskunalariga diagnostika, ta'mirlash va kafolat.", textRu: 'С 2007 года: диагностика, ремонт и гарантийное обслуживание котлов и газового оборудования.' },
+      { iconPath: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', titleUz: '5 yilgacha kafolat', titleRu: 'Гарантия до 5 лет', textUz: "Ishlab chiqaruvchining rasmiy brend va ulgurji narx bo'yicha hamkorlik.", textRu: 'Официальная гарантия производителя и партнёрские оптовые цены.' },
+      { iconPath: 'M5 8h14M5 8a2 2 0 1 0 0-4h14a2 2 0 0 0 0-4M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-9 4h4', titleUz: 'Bepul yetkazib berish', titleRu: 'Бесплатная доставка', textUz: "Toshkent shahri bo'ylab mahsulot turidan va so'miga qarab bepul yetkazib berish.", textRu: 'Бесплатная доставка по Ташкенту в зависимости от вида и суммы заказа.' },
+    ];
+
+    var adv = advItems.map(function (a) {
+      return '<div class="adv-item">' +
+        '<div class="adv-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + a.iconPath + '"/></svg></div>' +
+        '<div><p class="adv-title">' + esc(lang === 'ru' ? a.titleRu : a.titleUz) + '</p>' +
+        '<p class="adv-text">' + esc(lang === 'ru' ? a.textRu : a.textUz) + '</p></div>' +
+      '</div>';
+    }).join('');
+
     var cats = CATS.map(function (c) {
       return '<a class="cat-tile" href="catalog.html?cat=' + encodeURIComponent(c.id) + '">' +
-        '<img src="' + esc(c.icon) + '" alt="" width="72" height="72"><span>' + esc(loc(c, 'name')) + '</span></a>';
+        '<img src="' + esc(c.icon) + '" alt="" width="60" height="60">' +
+        '<span>' + esc(loc(c, 'name')) + '</span></a>';
     }).join('');
+
     var featured = PRODUCTS.filter(function (p) { return p.featured; }).slice(0, 8).map(productCard).join('');
+
     var why = ['wholesale', 'delivery', 'advice', 'quality'].map(function (k, i) {
       return '<div class="why-item"><span class="why-num">0' + (i + 1) + '</span><h3>' + esc(t('why.' + k + '.t')) + '</h3><p>' + esc(t('why.' + k + '.d')) + '</p></div>';
     }).join('');
+
     var tg = CFG.telegram ? '<a class="btn btn-light" href="' + esc(telegramUrl()) + '" target="_blank" rel="noopener">' + esc(t('contact.write')) + '</a>' : '';
 
     app.innerHTML =
-      '<section class="hero"><div class="container hero-inner">' +
-        '<div class="hero-text"><h1>' + esc(t('hero.title')) + '</h1><p>' + esc(t('hero.text')) + '</p>' +
-          '<div class="hero-buttons"><a class="btn btn-accent" href="catalog.html">' + esc(t('hero.catalog')) + '</a>' +
-          phoneLink('btn btn-outline-light', t('hero.call')) + '</div></div>' +
-        '<div class="hero-art" aria-hidden="true"><img src="assets/img/cat-radiators.svg" alt=""><img src="assets/img/cat-boilers.svg" alt=""><img src="assets/img/cat-valves.svg" alt=""></div>' +
-      '</div></section>' +
+      // HERO SLIDER
+      '<section class="hero" id="hero-section" style="position:relative">' +
+        '<div class="container hero-inner" id="hero-inner">' +
+          slideHtml(curSlide) +
+        '</div>' +
+        '<div class="hero-dots" id="hero-dots">' + dotsHtml() + '</div>' +
+        '<button type="button" class="hero-prev" id="hero-prev" aria-label="Oldingi">&#8249;</button>' +
+        '<button type="button" class="hero-next" id="hero-next" aria-label="Keyingi">&#8250;</button>' +
+      '</section>' +
+
+      // AFZALLIKLAR
+      '<section class="advantages"><div class="container"><div class="adv-grid">' + adv + '</div></div></section>' +
+
+      // KATEGORIYALAR
       '<section class="container section"><h2>' + esc(t('home.categories')) + '</h2><div class="cat-grid">' + cats + '</div></section>' +
-      '<section class="container section"><div class="section-head"><h2>' + esc(t('home.featured')) + '</h2><a href="catalog.html">' + esc(t('home.allProducts')) + '</a></div>' +
-        '<div class="product-grid">' + featured + '</div></section>' +
-      '<section class="section why"><div class="container"><h2>' + esc(t('home.why')) + '</h2><div class="why-grid">' + why + '</div></div></section>' +
+
+      // OMMABOP MAHSULOTLAR
+      '<section class="container section">' +
+        '<div class="section-head"><h2>' + esc(t('home.featured')) + '</h2><a href="catalog.html">' + esc(t('home.allProducts')) + '</a></div>' +
+        '<div class="product-grid">' + featured + '</div>' +
+      '</section>' +
+
+      // NEGA BIZNI
+      '<section class="section why"><div class="container"><h2 style="margin-bottom:24px">' + esc(t('home.why')) + '</h2><div class="why-grid">' + why + '</div></div></section>' +
+
+      // STATISTIKA
       statsBar() +
-      // Telefon ham, Telegram ham bo'lmasa, "Bog'laning" bloki ko'rsatilmaydi
-      (CFG.phone || tg ? '<section class="container section"><div class="cta"><div><h2>' + esc(t('home.ctaTitle')) + '</h2><p>' + esc(t('home.ctaText')) + '</p></div>' +
-        '<div class="cta-buttons">' + phoneLink('btn btn-accent') + tg + '</div></div></section>' : '');
+
+      // CTA
+      (CFG.phone || tg
+        ? '<section class="container section"><div class="cta"><div><h2>' + esc(t('home.ctaTitle')) + '</h2><p>' + esc(t('home.ctaText')) + '</p></div>' +
+          '<div class="cta-buttons">' + phoneLink('btn btn-accent') + tg + '</div></div></section>'
+        : '');
+
     bindAddButtons(app);
     if (window.ANIM) window.ANIM.init();
-    var store = {
+
+    // Slider logikasi
+    var heroInner = $('#hero-inner');
+    var heroDots = $('#hero-dots');
+
+    function goSlide(n) {
+      curSlide = (n + slides.length) % slides.length;
+      heroInner.innerHTML = slideHtml(curSlide);
+      heroDots.innerHTML = dotsHtml();
+      bindSliderDots();
+      bindAddButtons(heroInner);
+    }
+
+    function bindSliderDots() {
+      $all('.hero-dot', heroDots).forEach(function (dot, i) {
+        dot.addEventListener('click', function () { goSlide(i); });
+      });
+    }
+
+    bindSliderDots();
+    $('#hero-prev').addEventListener('click', function () { goSlide(curSlide - 1); });
+    $('#hero-next').addEventListener('click', function () { goSlide(curSlide + 1); });
+
+    // Avtomatik slider: 5 soniyada
+    var sliderTimer = setInterval(function () { goSlide(curSlide + 1); }, 5000);
+    app.addEventListener('click', function () { clearInterval(sliderTimer); }, { once: true });
+
+    addJsonLd('store-jsonld', {
       '@context': 'https://schema.org',
       '@type': 'HardwareStore',
       name: CFG.name,
@@ -315,9 +484,7 @@
       url: location.origin + '/',
       address: lang === 'ru' ? CFG.addressRu : CFG.addressUz,
       priceRange: '$$',
-    };
-    if (CFG.phone) store.telephone = CFG.phoneLink;
-    addJsonLd('store-jsonld', store);
+    });
   }
 
   function statsBar() {

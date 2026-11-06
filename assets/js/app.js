@@ -108,6 +108,13 @@
     var cart = getCart();
     cart[sku] = Math.min((cart[sku] || 0) + qty, 9999);
     saveCart(cart);
+    // Badge "pop" animatsiyasi
+    var badge = document.querySelector('[data-cart-count]');
+    if (badge) {
+      badge.classList.remove('pop');
+      void badge.offsetWidth; // reflow
+      badge.classList.add('pop');
+    }
   }
   function setCartQty(sku, qty) {
     var cart = getCart();
@@ -292,10 +299,12 @@
       '<section class="container section"><div class="section-head"><h2>' + esc(t('home.featured')) + '</h2><a href="catalog.html">' + esc(t('home.allProducts')) + '</a></div>' +
         '<div class="product-grid">' + featured + '</div></section>' +
       '<section class="section why"><div class="container"><h2>' + esc(t('home.why')) + '</h2><div class="why-grid">' + why + '</div></div></section>' +
+      statsBar() +
       // Telefon ham, Telegram ham bo'lmasa, "Bog'laning" bloki ko'rsatilmaydi
       (CFG.phone || tg ? '<section class="container section"><div class="cta"><div><h2>' + esc(t('home.ctaTitle')) + '</h2><p>' + esc(t('home.ctaText')) + '</p></div>' +
         '<div class="cta-buttons">' + phoneLink('btn btn-accent') + tg + '</div></div></section>' : '');
     bindAddButtons(app);
+    if (window.ANIM) window.ANIM.init();
     var store = {
       '@context': 'https://schema.org',
       '@type': 'HardwareStore',
@@ -307,6 +316,22 @@
     };
     if (CFG.phone) store.telephone = CFG.phoneLink;
     addJsonLd('store-jsonld', store);
+  }
+
+  function statsBar() {
+    var stats = [
+      { to: PRODUCTS.length, suffix: '+', labelUz: "Mahsulot turi", labelRu: 'Видов товара' },
+      { to: 5, suffix: '+', labelUz: 'Yil bozorda', labelRu: 'Лет на рынке' },
+      { to: 500, suffix: '+', labelUz: 'Bajarilgan loyiha', labelRu: 'Выполненных проектов' },
+      { to: 100, suffix: '%', labelUz: 'Sifat kafolati', labelRu: 'Гарантия качества' },
+    ];
+    var items = stats.map(function (s) {
+      return '<div class="stat-item">' +
+        '<span class="stat-num count-up" data-anim="fade-up" data-to="' + s.to + '" data-suffix="' + s.suffix + '">0' + s.suffix + '</span>' +
+        '<span class="stat-label">' + esc(lang === 'ru' ? s.labelRu : s.labelUz) + '</span>' +
+      '</div>';
+    }).join('');
+    return '<section class="stats-bar"><div class="container"><div class="stats-grid">' + items + '</div></div></section>';
   }
 
   function addJsonLd(id, data) {
@@ -371,6 +396,7 @@
       $('#found').textContent = t('catalog.found', { n: list.length });
       $('#grid').innerHTML = list.length ? list.map(productCard).join('') : '<p class="empty">' + esc(t('catalog.empty')) + '</p>';
       bindAddButtons($('#grid'));
+    if (window.ANIM) window.ANIM.init();
       $all('.chip', app).forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-cat') === state.cat)); });
 
       var sp = new URLSearchParams();
@@ -440,6 +466,7 @@
       });
     });
     bindAddButtons(app);
+    if (window.ANIM) window.ANIM.init();
     addProductJsonLd(p);
   }
 
@@ -544,6 +571,7 @@
         '</div>' +
       '</div>';
 
+    // Savatcha sahifasi
     function refresh() { render(); }
 
     $all('[data-cart-step]', app).forEach(function (b) {
@@ -566,6 +594,7 @@
     $('#clear-cart').addEventListener('click', function () { saveCart({}); refresh(); });
 
     var form = $('#order-form');
+    if (window.ANIM) window.ANIM.init();
     function readForm() {
       var fd = new FormData(form);
       return {
@@ -671,6 +700,7 @@
             '<div class="cta-buttons">' + phoneLink('btn btn-accent', t('hero.call')) + tg + '</div></div>' +
         '</div>' +
       '</div>';
+    if (window.ANIM) window.ANIM.init();
   }
 
   function page404(app) {

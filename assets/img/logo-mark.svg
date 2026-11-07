@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 114" aria-hidden="true">
+  <!-- 5 ta parrak: har biri yuqorida 16px, pastda 22px, bo'shliq 6px -->
+  <!-- Parrak 1 qizil -->
+  <polygon points="0,110  13,4  29,4  22,110" fill="#C0321A"/>
+  <!-- Parrak 2 qizil -->
+  <polygon points="28,110  39,4  55,4  48,110" fill="#C0321A"/>
+  <!-- Parrak 3 ko'k -->
+  <polygon points="56,110  65,4  81,4  74,110" fill="#1A44CC"/>
+  <!-- Parrak 4 ko'k -->
+  <polygon points="80,110  89,4  105,4  98,110" fill="#1A44CC"/>
+  <!-- Parrak 5 ko'k -->
+  <polygon points="104,110  111,4  127,4  122,110" fill="#1A44CC"/>
+</svg>

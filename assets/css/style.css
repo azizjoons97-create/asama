@@ -66,8 +66,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* 1-qator: logo + qidiruv + ijtimoiy + savat + til */
 .header-top { border-bottom: 1px solid var(--border); padding: 10px 0; }
 .header-top-inner { display: flex; align-items: center; gap: 20px; }
-.logo { display: flex; align-items: center; flex-shrink: 0; text-decoration: none !important; }
-.logo img { height: 42px; width: auto; display: block; }
+.logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; text-decoration: none !important; }
+.logo img { height: 44px; width: auto; display: block; flex-shrink: 0; }
+.logo-text { font-family: Barlow, 'Arial Narrow', Arial, sans-serif; font-weight: 800; font-size: 1.8rem; letter-spacing: .04em; color: #1A44CC; line-height: 1; white-space: nowrap; }
+.logo-footer .logo-text { color: #fff; }
 .logo strong, .logo small { display: none; }
 
 .header-search { flex: 1; max-width: 520px; position: relative; }

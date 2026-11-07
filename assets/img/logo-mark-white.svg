@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 114" aria-hidden="true">
+  <!-- Parrak 1 yarim shaffof oq -->
+  <polygon points="0,110  13,4  29,4  22,110" fill="rgba(255,255,255,0.6)"/>
+  <!-- Parrak 2 yarim shaffof oq -->
+  <polygon points="28,110  39,4  55,4  48,110" fill="rgba(255,255,255,0.6)"/>
+  <!-- Parrak 3 to'liq oq -->
+  <polygon points="56,110  65,4  81,4  74,110" fill="#fff"/>
+  <!-- Parrak 4 to'liq oq -->
+  <polygon points="80,110  89,4  105,4  98,110" fill="#fff"/>
+  <!-- Parrak 5 to'liq oq -->
+  <polygon points="104,110  113,4  129,4  122,110" fill="#fff"/>
+</svg>

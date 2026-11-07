@@ -172,7 +172,8 @@
       '<div class="header-top">' +
         '<div class="container header-top-inner">' +
           '<a class="logo" href="index.html" aria-label="' + esc(CFG.name) + '">' +
-            '<img src="assets/img/logo.svg" alt="' + esc(CFG.name) + '" height="42" width="200" style="display:block">' +
+            '<img src="assets/img/logo-mark.svg" alt="" height="44" width="56" style="display:block;flex-shrink:0">' +
+            '<span class="logo-text">ASAMA</span>' +
           '</a>' +
           '<div class="header-search">' +
             '<input type="search" id="header-search-input" placeholder="' + esc(t('catalog.search')) + '" aria-label="' + esc(t('catalog.search')) + '">' +
@@ -258,7 +259,12 @@
     $('#site-footer').innerHTML =
       '<div class="container footer-grid">' +
         '<div>' +
-          '<div class="footer-logo"><img src="assets/img/logo-white.svg" alt="' + esc(CFG.name) + '" height="36" style="display:block;width:auto;max-width:none"></div>' +
+          '<div class="footer-logo">' +
+            '<a class="logo logo-footer" href="index.html" aria-label="' + esc(CFG.name) + '">' +
+              '<img src="assets/img/logo-mark-white.svg" alt="" height="40" width="50" style="display:block;flex-shrink:0">' +
+              '<span class="logo-text">ASAMA</span>' +
+            '</a>' +
+          '</div>' +
           '<p>' + esc(lang === 'ru' ? CFG.sloganRu : CFG.sloganUz) + '</p>' +
         '</div>' +
         '<div><h3>' + esc(t('nav.catalog')) + '</h3><ul>' + cats + '</ul></div>' +

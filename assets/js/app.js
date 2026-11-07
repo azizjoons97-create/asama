@@ -1055,7 +1055,194 @@
       '<a class="btn btn-primary" href="index.html">' + esc(t('nav.home')) + '</a></div>';
   }
 
-  var PAGES = { home: pageHome, catalog: pageCatalog, product: pageProduct, cart: pageCart, about: pageAbout, wishlist: pageWishlist, compare: pageCompare, wholesale: pageWholesale, '404': page404 };
+  var PAGES = { home: pageHome, catalog: pageCatalog, product: pageProduct, cart: pageCart, about: pageAbout, wishlist: pageWishlist, compare: pageCompare, wholesale: pageWholesale, 'room-calc': pageRoomCalc, '404': page404 };
+
+  // ========== SEVIMLILAR ==========
+  function pageWishlist(app) {
+    setMeta(t('wish.title'));
+    var skus = window.FEAT ? FEAT.getWish() : [];
+    var prods = skus.map(findProduct).filter(Boolean);
+    if (!prods.length) {
+      app.innerHTML = '<div class="container section"><h1>' + esc(t('wish.title')) + '</h1>' +
+        '<div class="wish-empty">' +
+          '<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto 12px;opacity:.3"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+          '<p>' + esc(t('wish.empty')) + '</p>' +
+          '<a class="btn btn-primary" href="catalog.html">' + esc(t('catalog.title')) + '</a>' +
+        '</div></div>';
+      return;
+    }
+    app.innerHTML = '<div class="container section"><h1>' + esc(t('wish.title')) + ' (' + prods.length + ')</h1>' +
+      '<div class="product-grid">' + prods.map(productCard).join('') + '</div></div>';
+    bindAddButtons(app);
+    bindCardFeatures(app);
+    if (window.ANIM) window.ANIM.init();
+  }
+
+  // ========== SOLISHTIRISH ==========
+  function pageCompare(app) {
+    setMeta(t('compare.title'));
+    var skus = window.FEAT ? FEAT.getCompare() : [];
+    var prods = skus.map(findProduct).filter(Boolean);
+    if (!prods.length) {
+      app.innerHTML = '<div class="container section"><h1>' + esc(t('compare.title')) + '</h1>' +
+        '<div class="compare-empty">' +
+          '<svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto 12px;opacity:.3"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>' +
+          '<p>' + esc(t('compare.empty')) + '</p>' +
+          '<a class="btn btn-primary" href="catalog.html">' + esc(t('catalog.title')) + '</a>' +
+        '</div></div>';
+      return;
+    }
+    var allSpecs = {};
+    prods.forEach(function (p) {
+      (p.specs || []).forEach(function (s) {
+        var key = lang === 'ru' ? s[1] : s[0];
+        allSpecs[key] = true;
+      });
+    });
+    var specKeys = Object.keys(allSpecs);
+    var cols = prods.map(function (p) {
+      return '<td>' +
+        '<a href="' + productUrl(p) + '"><img style="width:100px;height:100px;object-fit:contain;background:#f0f4fc;border-radius:8px;padding:8px;display:block" src="' + esc(productImage(p)) + '" alt="' + esc(loc(p, 'name')) + '"></a>' +
+        '<p style="font-weight:700;margin:8px 0 4px"><a href="' + productUrl(p) + '">' + esc(loc(p, 'name')) + '</a></p>' +
+        '<button type="button" class="compare-remove" data-cmp-remove="' + esc(p.sku) + '">' + esc(t('compare.remove')) + '</button>' +
+      '</td>';
+    }).join('');
+    var priceRow = '<tr><th>' + esc(lang === 'ru' ? 'Цена' : 'Narx') + '</th>' +
+      prods.map(function (p) { return '<td style="font-size:1.2rem;font-weight:800;color:var(--blue-dark)">' + priceBlock(p) + '</td>'; }).join('') + '</tr>';
+    var stockRow = '<tr><th>' + esc(lang === 'ru' ? 'Наличие' : 'Mavjudlik') + '</th>' +
+      prods.map(function (p) { return '<td>' + stockBadge(p) + '</td>'; }).join('') + '</tr>';
+    var addRow = '<tr><th></th>' +
+      prods.map(function (p) { return '<td><button class="btn btn-primary btn-sm btn-block" type="button" data-add="' + esc(p.sku) + '">' + esc(t('product.add')) + '</button></td>'; }).join('') + '</tr>';
+    var specRows = specKeys.map(function (key) {
+      return '<tr><th>' + esc(key) + '</th>' +
+        prods.map(function (p) {
+          var sp = (p.specs || []).filter(function (s) { return (lang === 'ru' ? s[1] : s[0]) === key; })[0];
+          return '<td>' + (sp ? esc(sp[2]) : '<span style="color:var(--border)">—</span>') + '</td>';
+        }).join('') + '</tr>';
+    }).join('');
+    app.innerHTML = '<div class="container section">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:20px">' +
+        '<h1>' + esc(t('compare.title')) + ' (' + prods.length + ')</h1>' +
+        '<button type="button" class="link-btn" id="cmp-clear-all">' + esc(t('compare.clear')) + '</button>' +
+      '</div>' +
+      '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--border);border-radius:var(--radius)">' +
+        '<thead><tr><th style="background:var(--bg);padding:12px 16px;width:160px;font-size:.88rem;color:var(--muted)"></th>' + cols + '</tr></thead>' +
+        '<tbody>' + priceRow + stockRow + specRows + addRow + '</tbody>' +
+      '</table></div></div>';
+    bindAddButtons(app);
+    var clearAll = $('#cmp-clear-all');
+    if (clearAll) clearAll.addEventListener('click', function () { if (window.FEAT) { FEAT.saveCompare([]); render(); } });
+    $all('[data-cmp-remove]', app).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (!window.FEAT) return;
+        var newSkus = FEAT.getCompare().filter(function (s) { return s !== btn.getAttribute('data-cmp-remove'); });
+        FEAT.saveCompare(newSkus);
+        render();
+      });
+    });
+  }
+
+  // ========== ULGURJI SO'ROV ==========
+  function pageWholesale(app) {
+    setMeta(t('wholesale.title'));
+    app.innerHTML = '<div class="container section">' +
+      '<h1>' + esc(t('wholesale.title')) + '</h1>' +
+      '<p class="muted" style="max-width:600px;margin-bottom:28px">' +
+        esc(lang === 'ru'
+          ? 'Для крупных заказов, строительных организаций и мастеров. Заполните форму — свяжемся в течение рабочего дня.'
+          : "Yirik buyurtmalar, qurilish tashkilotlari va ustalar uchun. Formani to'ldiring — ish kuni ichida bog'lanamiz.") +
+      '</p>' +
+      '<form class="wholesale-form" id="wholesale-form" novalidate>' +
+        '<label>' + esc(t('wholesale.company')) + ' <span class="muted small">(' + esc(lang === 'ru' ? 'необязательно' : 'ixtiyoriy') + ')</span><input name="company" maxlength="120" autocomplete="organization"></label>' +
+        '<label>' + esc(t('wholesale.name')) + ' *<input name="wh-name" required maxlength="80" autocomplete="name"></label>' +
+        '<label>' + esc(t('wholesale.phone')) + ' *<input name="wh-phone" type="tel" required maxlength="20" placeholder="+998 90 123 45 67" autocomplete="tel"></label>' +
+        '<label>' + esc(t('wholesale.items')) + ' *<textarea name="items" required maxlength="1000" rows="5"></textarea></label>' +
+        '<label>' + esc(t('order.comment')) + '<textarea name="comment" maxlength="500" rows="3"></textarea></label>' +
+        '<label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>' +
+        '<p class="form-error" id="wh-error" role="alert" hidden></p>' +
+        '<button type="submit" class="btn btn-accent btn-block">' + esc(t('wholesale.submit')) + '</button>' +
+      '</form></div>';
+    var form = $('#wholesale-form');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var fd = new FormData(form);
+      var name  = String(fd.get('wh-name')  || '').trim();
+      var phone = String(fd.get('wh-phone') || '').trim();
+      var items = String(fd.get('items')    || '').trim();
+      var website = String(fd.get('website') || '');
+      var errEl = $('#wh-error');
+      var d = phone.replace(/\D/g, '');
+      if (d.length === 9) d = '998' + d;
+      var normPhone = /^998\d{9}$/.test(d) ? '+' + d : null;
+      if (website) { errEl.hidden = true; return; }
+      var err = !name ? t('order.errName') : !normPhone ? t('order.errPhone') : !items ? (lang === 'ru' ? 'Укажите нужные товары.' : "Kerakli mahsulotlarni kiriting.") : '';
+      if (err) { errEl.textContent = err; errEl.hidden = false; return; }
+      errEl.hidden = true;
+      var text = (lang === 'ru' ? 'Оптовый запрос с сайта' : "Saytdan ulgurji so'rov") + '\n' +
+        (lang === 'ru' ? 'Компания' : 'Kompaniya') + ': ' + (String(fd.get('company') || '').trim() || '—') + '\n' +
+        t('wholesale.name') + ': ' + name + '\n' + t('wholesale.phone') + ': ' + normPhone + '\n\n' +
+        t('wholesale.items') + ':\n' + items +
+        (String(fd.get('comment') || '').trim() ? '\n\n' + (lang === 'ru' ? 'Комментарий' : 'Izoh') + ': ' + String(fd.get('comment') || '').trim() : '');
+      var btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.textContent = t('order.sending');
+      fetch(CFG.orderEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, phone: normPhone, text: text, items: [] }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return r.ok && j.ok; }); })
+        .catch(function () { return false; })
+        .then(function (ok) {
+          if (ok) {
+            app.innerHTML = '<div class="container section center"><div class="success-icon">✓</div><h1>' + esc(t('wholesale.success')) + '</h1><a class="btn btn-primary" href="catalog.html">' + esc(t('catalog.title')) + '</a></div>';
+          } else {
+            btn.disabled = false; btn.textContent = t('wholesale.submit');
+            errEl.textContent = lang === 'ru' ? 'Ошибка. Напишите нам напрямую.' : "Xato. Bizga to'g'ridan-to'g'ri yozing.";
+            errEl.hidden = false;
+          }
+        });
+    });
+  }
+
+  // ========== XONA KALKULYATORI ==========
+  function pageRoomCalc(app) {
+    setMeta(t('calc.room.title'));
+    app.innerHTML = '<div class="container section">' +
+      '<h1>' + esc(t('calc.room.title')) + '</h1>' +
+      '<p class="muted" style="max-width:600px;margin-bottom:24px">' + esc(t('calc.room.desc')) + '</p>' +
+      '<div class="room-calc">' +
+        '<div class="room-inputs">' +
+          '<label>' + esc(t('calc.room.length')) + '<input type="number" id="rc-length" min="1" max="100" value="5" step="0.5"></label>' +
+          '<label>' + esc(t('calc.room.width'))  + '<input type="number" id="rc-width"  min="1" max="100" value="4" step="0.5"></label>' +
+          '<label>' + esc(t('calc.room.height')) + '<input type="number" id="rc-height" min="2" max="6"   value="2.7" step="0.1"></label>' +
+        '</div>' +
+        '<button type="button" class="btn btn-primary" id="rc-calc">' + esc(t('calc.room.btn')) + '</button>' +
+        '<div class="room-result" id="rc-result">' +
+          '<h3>' + esc(t('calc.room.result')) + '</h3>' +
+          '<div class="room-result-grid">' +
+            '<div class="room-result-item"><div class="r-num" id="rc-sections">—</div><div class="r-label">' + esc(t('calc.room.radiators')) + '</div><div class="r-note">' + esc(lang === 'ru' ? 'секций (500 мм, алюминий)' : 'seksiya (500 mm, alyumin)') + '</div></div>' +
+            '<div class="room-result-item"><div class="r-num" id="rc-heat">—</div><div class="r-label">' + esc(t('calc.room.heat')) + '</div><div class="r-note">Вт / Vt</div></div>' +
+            '<div class="room-result-item"><div class="r-num" id="rc-hot">—</div><div class="r-label">' + esc(t('calc.room.pipe.hot')) + '</div><div class="r-note">' + esc(lang === 'ru' ? 'метров, PPR PN20' : 'metr, PPR PN20') + '</div></div>' +
+            '<div class="room-result-item"><div class="r-num" id="rc-cold">—</div><div class="r-label">' + esc(t('calc.room.pipe.cold')) + '</div><div class="r-note">' + esc(lang === 'ru' ? 'метров, PPR PN20' : 'metr, PPR PN20') + '</div></div>' +
+          '</div>' +
+          '<p class="muted small">' + esc(t('calc.room.note')) + '</p>' +
+          '<a class="btn btn-accent" href="catalog.html?cat=radiators" style="margin-top:8px">' + esc(lang === 'ru' ? 'Смотреть радиаторы' : 'Radiatorlarni ko\'rish') + '</a>' +
+        '</div>' +
+      '</div></div>';
+    function calc() {
+      var L = parseFloat($('#rc-length').value) || 5;
+      var W = parseFloat($('#rc-width').value)  || 4;
+      var H = parseFloat($('#rc-height').value) || 2.7;
+      var area = L * W;
+      var heatLoad = Math.round(area * H * 40);
+      var sections = Math.ceil(heatLoad / 180);
+      var perimeter = 2 * (L + W);
+      var pipe = Math.ceil(perimeter * 1.2);
+      $('#rc-sections').textContent = sections;
+      $('#rc-heat').textContent = heatLoad + ' Vt';
+      $('#rc-hot').textContent = pipe + ' m';
+      $('#rc-cold').textContent = pipe + ' m';
+      $('#rc-result').classList.add('visible');
+    }
+    $('#rc-calc').addEventListener('click', calc);
+    calc();
+  }
 
   function render() {
     var page = document.body.getAttribute('data-page');

@@ -183,6 +183,14 @@
           '</div>' +
           '<div class="header-top-right">' +
             tgIcon +
+            '<a class="header-icon-link" href="wishlist.html" aria-label="' + esc(t('wish.title')) + '">' +
+              '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+              '<span class="badge" data-wish-count hidden>0</span>' +
+            '</a>' +
+            '<a class="header-icon-link" href="compare.html" aria-label="' + esc(t('compare.title')) + '">' +
+              '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>' +
+              '<span class="badge" data-cmp-count hidden>0</span>' +
+            '</a>' +
             '<div class="lang-switch" role="group" aria-label="Til / Язык">' + langs + '</div>' +
             '<a class="cart-link" href="cart.html"' + (page === 'cart' ? ' aria-current="page"' : '') + ' aria-label="' + esc(t('nav.cart')) + '">' +
               '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="17.5" cy="20.5" r="1.3" fill="currentColor" stroke="none"/></svg>' +
@@ -302,6 +310,14 @@
         '<img src="' + esc(productImage(p)) + '" alt="' + esc(loc(p, 'name')) + '" loading="lazy" width="160" height="160">' +
       '</a>' +
       '<div class="card-body">' +
+        '<div class="card-actions">' +
+          '<button type="button" class="card-icon-btn wish-btn" data-wish-btn="' + esc(p.sku) + '" aria-pressed="false" title="' + esc(t('wish.add')) + '">' +
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+          '</button>' +
+          '<button type="button" class="card-icon-btn cmp-btn" data-cmp-btn="' + esc(p.sku) + '" aria-pressed="false" title="' + esc(t('compare.add')) + '">' +
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>' +
+          '</button>' +
+        '</div>' +
         stockBadge(p) +
         '<h3 class="card-title"><a href="' + url + '">' + esc(loc(p, 'name')) + '</a></h3>' +
         '<div class="card-price">' + priceBlock(p) + '</div>' +
@@ -322,6 +338,72 @@
         setTimeout(function () { btn.textContent = label; btn.classList.remove('added'); }, 1300);
       });
     });
+  }
+
+  function bindCardFeatures(root) {
+    if (!window.FEAT) return;
+    $all('[data-wish-btn]', root).forEach(function (btn) {
+      if (FEAT.inWish(btn.getAttribute('data-wish-btn'))) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+      }
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var active = FEAT.toggleWish(btn.getAttribute('data-wish-btn'));
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+      });
+    });
+    $all('[data-cmp-btn]', root).forEach(function (btn) {
+      if (FEAT.inCompare(btn.getAttribute('data-cmp-btn'))) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+      }
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var sku = btn.getAttribute('data-cmp-btn');
+        var result = FEAT.toggleCompare(sku);
+        if (result === 'max') {
+          alert(t('compare.max'));
+          return;
+        }
+        btn.classList.toggle('active', result);
+        btn.setAttribute('aria-pressed', String(result));
+        showCompareBar();
+      });
+    });
+  }
+
+  function showCompareBar() {
+    if (!window.FEAT) return;
+    var bar = document.getElementById('compare-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'compare-bar';
+      bar.className = 'compare-bar';
+      document.body.appendChild(bar);
+    }
+    var skus = FEAT.getCompare();
+    bar.hidden = skus.length === 0;
+    if (skus.length === 0) return;
+    var names = skus.map(function (s) {
+      var p = findProduct(s);
+      return p ? '<span>' + esc(loc(p, 'name').substring(0, 28)) + (loc(p, 'name').length > 28 ? '…' : '') + '</span>' : '';
+    }).join('');
+    bar.innerHTML = '<div class="compare-bar-inner container">' +
+      '<strong>' + esc(t('compare.title')) + ' (' + skus.length + '):</strong> ' + names +
+      '<a class="btn btn-accent btn-sm" href="compare.html">' + esc(t('compare.go')) + '</a>' +
+      '<button type="button" class="link-btn" id="cmp-clear">' + esc(t('compare.clear')) + '</button>' +
+    '</div>';
+    var clearBtn = document.getElementById('cmp-clear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        FEAT.saveCompare([]);
+        bar.hidden = true;
+      });
+    }
   }
 
   // ---------- Sahifalar ----------
@@ -454,6 +536,7 @@
         : '');
 
     bindAddButtons(app);
+    bindCardFeatures(app);
     if (window.ANIM) window.ANIM.init();
 
     // Slider logikasi
@@ -466,6 +549,7 @@
       heroDots.innerHTML = dotsHtml();
       bindSliderDots();
       bindAddButtons(heroInner);
+      bindCardFeatures(heroInner);
     }
 
     function bindSliderDots() {
@@ -545,6 +629,14 @@
           '<input type="search" id="q" placeholder="' + esc(t('catalog.search')) + '" value="' + esc(state.q) + '" aria-label="' + esc(t('catalog.search')) + '">' +
           '<label class="check"><input type="checkbox" id="stock"' + (state.stock ? ' checked' : '') + '> ' + esc(t('catalog.inStockOnly')) + '</label>' +
           '<select id="sort" aria-label="' + esc(t('catalog.sort')) + '">' + sorts + '</select>' +
+          '<div class="price-filter">' +
+            '<label class="price-filter-label">' + esc(t('filter.price')) + ':</label>' +
+            '<input type="number" id="price-min" placeholder="' + esc(t('filter.from')) + '" min="0" style="width:110px">' +
+            '<span>—</span>' +
+            '<input type="number" id="price-max" placeholder="' + esc(t('filter.to')) + '" min="0" style="width:110px">' +
+            '<button type="button" class="btn btn-primary btn-sm" id="price-apply">' + esc(t('filter.apply')) + '</button>' +
+            '<button type="button" class="link-btn" id="price-reset">' + esc(t('filter.reset')) + '</button>' +
+          '</div>' +
         '</div>' +
         '<p class="muted" id="found"></p>' +
         '<div class="product-grid" id="grid"></div>' +
@@ -561,6 +653,10 @@
         }
         return true;
       });
+      var priceMin = parseInt($('#price-min') && $('#price-min').value, 10) || 0;
+      var priceMax = parseInt($('#price-max') && $('#price-max').value, 10) || 0;
+      if (priceMin > 0) list = list.filter(function (p) { return p.retailPrice >= priceMin; });
+      if (priceMax > 0) list = list.filter(function (p) { return p.retailPrice <= priceMax; });
       if (state.sort === 'priceAsc') list.sort(function (a, b) { return a.retailPrice - b.retailPrice; });
       if (state.sort === 'priceDesc') list.sort(function (a, b) { return b.retailPrice - a.retailPrice; });
       if (state.sort === 'name') list.sort(function (a, b) { return loc(a, 'name').localeCompare(loc(b, 'name'), lang); });
@@ -571,6 +667,7 @@
       $('#found').textContent = t('catalog.found', { n: list.length });
       $('#grid').innerHTML = list.length ? list.map(productCard).join('') : '<p class="empty">' + esc(t('catalog.empty')) + '</p>';
       bindAddButtons($('#grid'));
+      bindCardFeatures($('#grid'));
     if (window.ANIM) window.ANIM.init();
       $all('.chip', app).forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-cat') === state.cat)); });
 
@@ -589,6 +686,16 @@
     $('#q').addEventListener('input', function (e) { state.q = e.target.value; apply(); });
     $('#sort').addEventListener('change', function (e) { state.sort = e.target.value; apply(); });
     $('#stock').addEventListener('change', function (e) { state.stock = e.target.checked; apply(); });
+    var priceApply = $('#price-apply');
+    var priceReset = $('#price-reset');
+    if (priceApply) priceApply.addEventListener('click', apply);
+    if (priceReset) {
+      priceReset.addEventListener('click', function () {
+        if ($('#price-min')) $('#price-min').value = '';
+        if ($('#price-max')) $('#price-max').value = '';
+        apply();
+      });
+    }
     apply();
   }
 
@@ -627,12 +734,54 @@
                 '<button type="button" data-step="1" aria-label="+">+</button></label>' +
               '<button type="button" class="btn btn-primary" data-add="' + esc(p.sku) + '" data-qty-input="#qty">' + esc(t('product.add')) + '</button>' +
             '</div>' +
+            '<div class="product-extra-actions">' +
+              '<button type="button" class="btn btn-light btn-sm wish-btn" data-wish-btn="' + esc(p.sku) + '">' +
+                '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ' + esc(t('wish.add')) +
+              '</button>' +
+              '<button type="button" class="btn btn-light btn-sm cmp-btn" data-cmp-btn="' + esc(p.sku) + '">' +
+                '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> ' + esc(t('compare.add')) +
+              '</button>' +
+            '</div>' +
             '<p>' + esc(loc(p, 'desc')) + '</p>' +
             (specs ? '<h2 class="h3">' + esc(t('product.specs')) + '</h2><table class="specs">' + specs + '</table>' : '') +
           '</div>' +
         '</div>' +
         (related.length ? '<section class="section"><h2>' + esc(t('product.related')) + '</h2><div class="product-grid">' + related.map(productCard).join('') + '</div></section>' : '') +
+        '<section class="section container">' +
+          '<div class="calc-box">' +
+            '<h2>' + esc(t('calc.title')) + ': ' + esc(loc(p, 'name')) + '</h2>' +
+            '<div class="calc-row">' +
+              '<label class="qty"><span>' + esc(t('calc.qty')) + ':</span>' +
+                '<button type="button" data-step="-1" class="calc-step">−</button>' +
+                '<input type="number" id="calc-qty" min="1" max="9999" value="1" inputmode="numeric">' +
+                '<button type="button" data-step="1" class="calc-step">+</button>' +
+              '</label>' +
+              '<div class="calc-result">' + esc(t('calc.total')) + ': <strong id="calc-total">' + formatPrice(p.retailPrice) + '</strong>' +
+                '<small> ' + esc(t('per')) + ' ' + esc(unitLabel(p)) + '</small>' +
+              '</div>' +
+            '</div>' +
+            '<p class="muted small">' + esc(t('calc.note')) + '</p>' +
+          '</div>' +
+        '</section>' +
       '</div>';
+
+    // Mahsulotni ko'rilganlarga qo'sh
+    if (window.FEAT) FEAT.addRecent(p.sku);
+    if (window.FEAT) FEAT.trackVisit('product', p.sku);
+
+    // Ko'rilgan mahsulotlar
+    if (window.FEAT) {
+      var recentSkus = FEAT.getRecent().filter(function (s) { return s !== p.sku; }).slice(0, 4);
+      var recentProds = recentSkus.map(findProduct).filter(Boolean);
+      if (recentProds.length) {
+        var recentSec = document.createElement('section');
+        recentSec.className = 'section container';
+        recentSec.innerHTML = '<h2>' + esc(t('recent.title')) + '</h2><div class="product-grid">' + recentProds.map(productCard).join('') + '</div>';
+        $('#app').appendChild(recentSec);
+        bindAddButtons(recentSec);
+        bindCardFeatures(recentSec);
+      }
+    }
 
     $all('[data-step]', app).forEach(function (b) {
       b.addEventListener('click', function () {
@@ -640,7 +789,29 @@
         input.value = Math.min(9999, Math.max(1, (parseInt(input.value, 10) || 1) + parseInt(b.getAttribute('data-step'), 10)));
       });
     });
+
+    // Kalkulyator
+    var calcQty = $('#calc-qty');
+    var calcTotal = $('#calc-total');
+    function updateCalc() {
+      if (!calcQty || !calcTotal) return;
+      var qty = Math.max(1, parseInt(calcQty.value, 10) || 1);
+      calcTotal.textContent = formatPrice(p.retailPrice * qty);
+    }
+    if (calcQty) {
+      calcQty.addEventListener('input', updateCalc);
+      $all('.calc-step', app).forEach(function (b) {
+        b.addEventListener('click', function () {
+          if (!calcQty) return;
+          calcQty.value = Math.min(9999, Math.max(1, (parseInt(calcQty.value, 10) || 1) + parseInt(b.getAttribute('data-step'), 10)));
+          updateCalc();
+        });
+      });
+    }
+
     bindAddButtons(app);
+    // Wish va compare tugmalarini bind qilish (mahsulot sahifasida)
+    bindCardFeatures(app);
     if (window.ANIM) window.ANIM.init();
     addProductJsonLd(p);
   }
@@ -884,7 +1055,7 @@
       '<a class="btn btn-primary" href="index.html">' + esc(t('nav.home')) + '</a></div>';
   }
 
-  var PAGES = { home: pageHome, catalog: pageCatalog, product: pageProduct, cart: pageCart, about: pageAbout, '404': page404 };
+  var PAGES = { home: pageHome, catalog: pageCatalog, product: pageProduct, cart: pageCart, about: pageAbout, wishlist: pageWishlist, compare: pageCompare, wholesale: pageWholesale, '404': page404 };
 
   function render() {
     var page = document.body.getAttribute('data-page');
@@ -893,6 +1064,31 @@
     renderFooter();
     (PAGES[page] || page404)($('#app'));
     updateCartBadge();
+    if (window.FEAT) FEAT.init();
+    if (window.FEAT) showCompareBar();
+    renderFloatingBtn();
+  }
+
+  function renderFloatingBtn() {
+    var existing = document.getElementById('floating-btn');
+    if (existing) existing.remove();
+    if (!CFG.telegram && !CFG.phone) return;
+    var btn = document.createElement('div');
+    btn.id = 'floating-btn';
+    btn.className = 'floating-btn';
+    var inner = '';
+    if (CFG.telegram) {
+      inner += '<a href="https://t.me/' + encodeURIComponent(CFG.telegram) + '" target="_blank" rel="noopener" class="float-item float-tg" aria-label="Telegram">' +
+        '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-2.038 9.593c-.15.668-.543.832-1.1.517l-3.037-2.237-1.465 1.41c-.162.162-.298.298-.61.298l.217-3.088 5.62-5.073c.244-.217-.053-.337-.378-.12L7.27 14.482l-2.99-.934c-.65-.203-.663-.65.136-.962l11.67-4.502c.542-.196 1.017.12.476.164z"/></svg>' +
+      '</a>';
+    }
+    if (CFG.phone) {
+      inner += '<a href="tel:' + encodeURIComponent(CFG.phoneLink) + '" class="float-item float-phone" aria-label="' + esc(CFG.phone) + '">' +
+        '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>' +
+      '</a>';
+    }
+    btn.innerHTML = inner;
+    document.body.appendChild(btn);
   }
 
   // Boshqa oynada savatcha o'zgarsa, belgini yangilash
@@ -900,3 +1096,185 @@
 
   render();
 })();
+
+  // ========== SEVIMLILAR SAHIFASI ==========
+  function pageWishlist(app) {
+    setMeta(t('wish.title'));
+    var skus = window.FEAT ? FEAT.getWish() : [];
+    var prods = skus.map(findProduct).filter(Boolean);
+    if (!prods.length) {
+      app.innerHTML = '<div class="container section"><h1>' + esc(t('wish.title')) + '</h1>' +
+        '<div class="wish-empty"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+        '<p>' + esc(t('wish.empty')) + '</p>' +
+        '<a class="btn btn-primary" href="catalog.html">' + esc(t('catalog.title')) + '</a></div></div>';
+      return;
+    }
+    app.innerHTML = '<div class="container section"><h1>' + esc(t('wish.title')) + ' (' + prods.length + ')</h1>' +
+      '<div class="product-grid">' + prods.map(productCard).join('') + '</div></div>';
+    bindAddButtons(app);
+    bindCardFeatures(app);
+    if (window.ANIM) window.ANIM.init();
+  }
+
+  // ========== SOLISHTIRISH SAHIFASI ==========
+  function pageCompare(app) {
+    setMeta(t('compare.title'));
+    var skus = window.FEAT ? FEAT.getCompare() : [];
+    var prods = skus.map(findProduct).filter(Boolean);
+    if (!prods.length) {
+      app.innerHTML = '<div class="container section"><h1>' + esc(t('compare.title')) + '</h1>' +
+        '<div class="compare-empty"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>' +
+        '<p>' + esc(t('compare.empty')) + '</p>' +
+        '<a class="btn btn-primary" href="catalog.html">' + esc(t('catalog.title')) + '</a></div></div>';
+      return;
+    }
+
+    // Barcha xususiyatlar ro'yxati
+    var allSpecs = {};
+    prods.forEach(function (p) {
+      (p.specs || []).forEach(function (s) {
+        var key = lang === 'ru' ? s[1] : s[0];
+        allSpecs[key] = true;
+      });
+    });
+    var specKeys = Object.keys(allSpecs);
+
+    // Mahsulot ustunlari
+    var headerCells = prods.map(function (p) {
+      return '<td>' +
+        '<a href="' + productUrl(p) + '"><img class="compare-img" src="' + esc(productImage(p)) + '" alt="' + esc(loc(p, 'name')) + '"></a>' +
+        '<p class="compare-name"><a href="' + productUrl(p) + '">' + esc(loc(p, 'name')) + '</a></p>' +
+        '<button type="button" class="compare-remove" data-cmp-remove="' + esc(p.sku) + '">' + esc(t('compare.remove')) + '</button>' +
+      '</td>';
+    }).join('');
+
+    var priceRow = '<tr><th>' + esc(lang === 'ru' ? 'Цена' : 'Narx') + '</th>' +
+      prods.map(function (p) { return '<td class="compare-price">' + priceBlock(p) + '</td>'; }).join('') + '</tr>';
+
+    var stockRow = '<tr><th>' + esc(lang === 'ru' ? 'Наличие' : 'Mavjudlik') + '</th>' +
+      prods.map(function (p) { return '<td>' + stockBadge(p) + '</td>'; }).join('') + '</tr>';
+
+    var addRow = '<tr><th></th>' +
+      prods.map(function (p) { return '<td><button type="button" class="btn btn-primary btn-sm btn-block" data-add="' + esc(p.sku) + '">' + esc(t('product.add')) + '</button></td>'; }).join('') + '</tr>';
+
+    var specRows = specKeys.map(function (key) {
+      return '<tr><th>' + esc(key) + '</th>' +
+        prods.map(function (p) {
+          var spec = (p.specs || []).find(function (s) { return (lang === 'ru' ? s[1] : s[0]) === key; });
+          return '<td>' + (spec ? esc(spec[2]) : '<span style="color:var(--border)">—</span>') + '</td>';
+        }).join('') +
+      '</tr>';
+    }).join('');
+
+    app.innerHTML = '<div class="container section">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:20px">' +
+        '<h1>' + esc(t('compare.title')) + ' (' + prods.length + ')</h1>' +
+        '<button type="button" class="link-btn" id="cmp-clear-all">' + esc(t('compare.clear')) + '</button>' +
+      '</div>' +
+      '<div class="compare-table-wrap">' +
+        '<table class="compare-table">' +
+          '<thead><tr><th></th>' + headerCells + '</tr></thead>' +
+          '<tbody>' + priceRow + stockRow + specRows + addRow + '</tbody>' +
+        '</table>' +
+      '</div></div>';
+
+    bindAddButtons(app);
+    var clearAll = $('#cmp-clear-all');
+    if (clearAll) {
+      clearAll.addEventListener('click', function () {
+        if (window.FEAT) { FEAT.saveCompare([]); render(); }
+      });
+    }
+    $all('[data-cmp-remove]', app).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (window.FEAT) {
+          var skus = FEAT.getCompare().filter(function (s) { return s !== btn.getAttribute('data-cmp-remove'); });
+          FEAT.saveCompare(skus);
+          render();
+        }
+      });
+    });
+  }
+
+  // ========== ULGURJI SO'ROV SAHIFASI ==========
+  function pageWholesale(app) {
+    setMeta(t('wholesale.title'));
+    app.innerHTML = '<div class="container section">' +
+      '<h1>' + esc(t('wholesale.title')) + '</h1>' +
+      '<p class="muted" style="max-width:600px;margin-bottom:28px">' +
+        esc(lang === 'ru'
+          ? 'Для крупных заказов, строительных организаций и мастеров. Заполните форму — мы свяжемся с вами в течение рабочего дня.'
+          : "Yirik buyurtmalar, qurilish tashkilotlari va ustalar uchun. Formani to'ldiring — biz siz bilan ish kuni davomida bog'lanamiz.") +
+      '</p>' +
+      '<form class="wholesale-form" id="wholesale-form" novalidate>' +
+        '<label>' + esc(t('wholesale.company')) + ' <span class="muted small">(' + esc(lang === 'ru' ? 'необязательно' : 'ixtiyoriy') + ')</span>' +
+          '<input name="company" maxlength="120" autocomplete="organization">' +
+        '</label>' +
+        '<label>' + esc(t('wholesale.name')) + ' *<input name="name" required maxlength="80" autocomplete="name"></label>' +
+        '<label>' + esc(t('wholesale.phone')) + ' *<input name="phone" type="tel" required maxlength="20" placeholder="+998 90 123 45 67" autocomplete="tel"></label>' +
+        '<label>' + esc(t('wholesale.items')) + ' *<textarea name="items" required maxlength="1000" rows="5"></textarea></label>' +
+        '<label>' + esc(t('order.comment')) + '<textarea name="comment" maxlength="500" rows="3"></textarea></label>' +
+        '<label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>' +
+        '<p class="form-error" id="wh-error" role="alert" hidden></p>' +
+        '<button type="submit" class="btn btn-accent btn-block">' + esc(t('wholesale.submit')) + '</button>' +
+      '</form></div>';
+
+    var form = $('#wholesale-form');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var fd = new FormData(form);
+      var name  = (fd.get('name')  || '').toString().trim();
+      var phone = (fd.get('phone') || '').toString().trim();
+      var items = (fd.get('items') || '').toString().trim();
+      var website = (fd.get('website') || '').toString();
+      var errEl = $('#wh-error');
+
+      var normPhone = (function(raw) {
+        var d = raw.replace(/\D/g, '');
+        if (d.length === 9) d = '998' + d;
+        return /^998\d{9}$/.test(d) ? '+' + d : null;
+      })(phone);
+
+      if (website) { errEl.hidden = true; return; }
+      var err = !name ? t('order.errName') : !normPhone ? t('order.errPhone') : !items ? t('wholesale.items') + ' ' + (lang === 'ru' ? 'обязательно' : 'majburiy') : '';
+      if (err) { errEl.textContent = err; errEl.hidden = false; return; }
+      errEl.hidden = true;
+
+      var text = (lang === 'ru' ? 'Оптовый запрос с сайта' : "Saytdan ulgurji so'rov") + '\n\n' +
+        (lang === 'ru' ? 'Компания' : 'Kompaniya') + ': ' + ((fd.get('company') || '').toString().trim() || '—') + '\n' +
+        t('wholesale.name') + ': ' + name + '\n' +
+        t('wholesale.phone') + ': ' + normPhone + '\n\n' +
+        t('wholesale.items') + ':\n' + items +
+        ((fd.get('comment') || '').toString().trim() ? '\n\n' + (lang === 'ru' ? 'Комментарий' : 'Izoh') + ': ' + (fd.get('comment') || '').toString().trim() : '');
+
+      var btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.textContent = t('order.sending');
+
+      fetch(CFG.orderEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, phone: normPhone, text: text, items: [], website: website }),
+      })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return r.ok && j.ok; }); })
+        .catch(function () { return false; })
+        .then(function (ok) {
+          if (ok) {
+            app.innerHTML = '<div class="container section center">' +
+              '<div class="success-icon">✓</div><h1>' + esc(t('wholesale.success')) + '</h1>' +
+              '<a class="btn btn-primary" href="catalog.html">' + esc(t('catalog.title')) + '</a></div>';
+          } else {
+            btn.disabled = false; btn.textContent = t('wholesale.submit');
+            var tgUrl = CFG.telegram ? 'https://t.me/' + encodeURIComponent(CFG.telegram) : '';
+            errEl.textContent = lang === 'ru' ? 'Ошибка отправки. Напишите нам напрямую.' : "Yuborishda xato. Bizga to'g'ridan-to'g'ri yozing.";
+            errEl.hidden = false;
+            if (tgUrl) {
+              var tgLink = document.createElement('a');
+              tgLink.href = tgUrl; tgLink.target = '_blank'; tgLink.rel = 'noopener';
+              tgLink.textContent = ' Telegram'; tgLink.className = 'btn btn-light btn-sm';
+              tgLink.style.marginTop = '8px';
+              errEl.parentNode.insertBefore(tgLink, errEl.nextSibling);
+            }
+          }
+        });
+    });
+  }

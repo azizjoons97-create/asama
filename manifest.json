@@ -1,0 +1,18 @@
+{
+  "name": "ASAMA Santexnika",
+  "short_name": "ASAMA",
+  "description": "PPR truba, radiatorlar, qozonlar, kranlar va smesitellar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f6fa",
+  "theme_color": "#1A44CC",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable any" }
+  ],
+  "shortcuts": [
+    { "name": "Katalog", "url": "/catalog.html", "description": "Mahsulotlar katalogi" },
+    { "name": "Savatcha", "url": "/cart.html", "description": "Savatcha" },
+    { "name": "Aloqa", "url": "/about.html", "description": "Biz bilan bog'laning" }
+  ]
+}

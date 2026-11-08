@@ -1,161 +1,65 @@
-/* Animatsiya CSS: style.css ga ulanmaydi, alohida fayl.
-   prefers-reduced-motion: animatsiyalar avtomatik o'chiriladi. */
+/* Animatsiya CSS — minimalist uslubga moslashtirilgan */
 
 /* ---------- Scroll fade-up ---------- */
 [data-anim] {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateY(16px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
   will-change: opacity, transform;
 }
 [data-anim].anim-done {
   opacity: 1;
   transform: none;
 }
-/* prefers-reduced-motion va JS yuklanmagan holat */
 @media (prefers-reduced-motion: reduce) {
   [data-anim] { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
-/* JS yuklanmagan bo'lsa ham ko'rsatilsin */
-.no-js [data-anim] { opacity: 1 !important; transform: none !important; }
 
-/* ---------- Mahsulot kartochkasi hover ---------- */
-.card {
-  transition: box-shadow 0.22s ease, transform 0.22s ease;
-}
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 28px rgba(16, 38, 70, .13);
-}
-/* Savatchaga tugmasi hover */
-.card .btn-primary {
-  transition: background 0.18s, transform 0.15s;
-}
-.card .btn-primary:hover {
-  transform: scale(1.03);
-}
+/* ---------- Kartochka hover ---------- */
+.card { transition: background .15s, box-shadow .2s; }
+.card:hover { box-shadow: var(--shadow-md); z-index: 1; }
 
-/* ---------- Kategoriya plitka hover ---------- */
-.cat-tile {
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-.cat-tile:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 8px 22px rgba(11, 95, 174, .12);
-}
+/* ---------- Kategoriya hover ---------- */
+.cat-tile { transition: background .15s, color .15s; }
 
-/* ---------- Tugma ripple effekti ---------- */
-.btn {
-  position: relative;
-  overflow: hidden;
-}
+/* ---------- Tugma ripple ---------- */
+.btn { position: relative; overflow: hidden; }
 .btn::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,.35) 1%, transparent 70%);
+  background: radial-gradient(circle, rgba(255,255,255,.25) 1%, transparent 70%);
   transform: scale(0);
   opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  transition: transform 0.35s ease, opacity 0.35s ease;
   pointer-events: none;
 }
-.btn:active::after {
-  transform: scale(2.5);
-  opacity: 1;
-  transition: none;
-}
+.btn:active::after { transform: scale(2.5); opacity: 1; transition: none; }
 
-/* ---------- Til tugmalari ---------- */
-.lang-switch button {
-  transition: background 0.18s, color 0.18s;
-}
-
-/* ---------- Header logo hover ---------- */
-.logo:hover strong {
-  color: var(--accent);
-  transition: color 0.2s;
-}
-
-/* ---------- Chips (katalog filtri) ---------- */
-.chip {
-  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.15s;
-}
-.chip:hover:not([aria-pressed="true"]) {
-  transform: scale(1.04);
-}
-.chip[aria-pressed="true"] {
-  transform: scale(1.04);
-}
-
-/* ---------- Statistika bloki (bosh sahifa) ---------- */
-.stats-bar {
-  background: var(--blue);
-  color: #fff;
-  padding: 32px 0;
-}
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  text-align: center;
-}
-.stat-num {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  font-weight: 800;
-  line-height: 1;
-  display: block;
-  margin-bottom: 6px;
-}
-.stat-label {
-  font-size: .9rem;
-  opacity: .85;
-}
-@media (max-width: 640px) {
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* ---------- "Nega bizni" raqam hover ---------- */
-.why-num {
-  transition: color 0.25s, -webkit-text-stroke-color 0.25s;
-}
-.why-item:hover .why-num {
-  -webkit-text-stroke-color: var(--accent);
-  color: rgba(192, 50, 26, .1);
-}
-
-/* ---------- Hero art rasmlari ---------- */
-.hero-art img {
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-.hero-art img:hover {
-  transform: translateY(-6px) scale(1.04);
-  box-shadow: 0 16px 36px rgba(0,0,0,.25);
-}
-
-/* ---------- Sahifa o'tishida yumshoq ko'rinish ---------- */
-#app {
-  animation: page-in 0.35s ease both;
-}
-@keyframes page-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  #app { animation: none; }
-}
-
-/* ---------- Footer havolalari ---------- */
-#site-footer a {
-  transition: color 0.18s;
-}
-
-/* ---------- Savatcha badge "bounce" ---------- */
+/* ---------- Badge pop ---------- */
 @keyframes badge-pop {
   0%   { transform: scale(1); }
-  40%  { transform: scale(1.5); }
-  70%  { transform: scale(0.9); }
+  40%  { transform: scale(1.4); }
+  70%  { transform: scale(0.92); }
   100% { transform: scale(1); }
 }
-.badge.pop {
-  animation: badge-pop 0.4s ease;
+.badge.pop { animation: badge-pop 0.35s ease; }
+
+/* ---------- Statistika ---------- */
+.stats-bar { overflow: hidden; }
+
+/* ---------- Sahifa kirish ---------- */
+#app { animation: page-in 0.3s ease both; }
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
 }
+@media (prefers-reduced-motion: reduce) { #app { animation: none; } }
+
+/* ---------- Why hover ---------- */
+.why-item { transition: background .15s; }
+.why-item:hover { background: var(--white); }
+.why-item:hover .why-num { color: var(--blue-light); }
+
+/* ---------- Footer havolalar ---------- */
+#site-footer a { transition: color .15s; }

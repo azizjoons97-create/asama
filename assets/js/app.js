@@ -183,6 +183,12 @@
           '</div>' +
           '<div class="header-top-right">' +
             tgIcon +
+            '<button type="button" class="header-icon-link" data-dark-btn aria-pressed="false" title="Tungi rejim">' +
+              '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' +
+            '</button>' +
+            '<a class="header-icon-link" href="orders.html" aria-label="' + esc(lang === 'ru' ? 'Мои заказы' : 'Buyurtmalarim') + '">' +
+              '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>' +
+            '</a>' +
             '<a class="header-icon-link" href="wishlist.html" aria-label="' + esc(t('wish.title')) + '">' +
               '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
               '<span class="badge" data-wish-count hidden>0</span>' +
@@ -211,6 +217,13 @@
 
     $all('[data-lang]').forEach(function (b) {
       b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); });
+    });
+    // Dark mode tugmasi
+    $all('[data-dark-btn]').forEach(function (btn) {
+      if (window.NEWF) NEWF.applyDark(NEWF.isDark()); // holat yangilash
+      btn.addEventListener('click', function () {
+        if (window.NEWF) NEWF.toggleDark();
+      });
     });
     var burger = $('.burger');
     burger.addEventListener('click', function () {
@@ -769,6 +782,48 @@
     if (window.FEAT) FEAT.addRecent(p.sku);
     if (window.FEAT) FEAT.trackVisit('product', p.sku);
 
+    // Reyting, ulashish, bundle va PWA qo'shish
+    if (window.NEWF) {
+      // Share tugmasi
+      var shareBtn = document.createElement('button');
+      shareBtn.type = 'button';
+      shareBtn.className = 'share-product-btn';
+      shareBtn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> ' + esc(lang === 'ru' ? 'Поделиться' : 'Ulashish');
+      var extraActions = app.querySelector('.product-extra-actions');
+      if (extraActions) {
+        extraActions.appendChild(shareBtn);
+        shareBtn.addEventListener('click', function () { NEWF.shareProduct(loc(p, 'name'), location.href); });
+      }
+      // Reyting bloki
+      var ratingDiv = document.createElement('div');
+      ratingDiv.style.cssText = 'margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+      ratingDiv.innerHTML = NEWF.starsHtml(p.sku, true) +
+        '<span class="rating-saved">' + esc(lang === 'ru' ? 'Сохранено!' : 'Saqlandi!') + '</span>' +
+        '<span class="muted small">' + esc(lang === 'ru' ? 'Ваша оценка' : 'Bahoyingiz') + '</span>';
+      var pInfoEl = app.querySelector('.product-info');
+      if (pInfoEl) pInfoEl.appendChild(ratingDiv);
+      NEWF.bindStars(app);
+      // Sovga taklifi
+      var bundleProds = PRODUCTS.filter(function (x) { return x.categoryId === p.categoryId && x.sku !== p.sku && x.inStock; }).slice(0, 3);
+      if (bundleProds.length) {
+        var bundleSec = document.createElement('div');
+        bundleSec.className = 'bundle-section';
+        bundleSec.innerHTML = '<h3>' + esc(lang === 'ru' ? 'С этим товаром берут' : "Bu bilan birga olinadi") + '</h3>' +
+          '<div class="bundle-grid">' + bundleProds.map(function (bp) {
+            return '<div class="bundle-item"><img src="' + esc(productImage(bp)) + '" alt="' + esc(loc(bp, 'name')) + '"><strong>' + esc(formatPrice(bp.retailPrice)) + '</strong><a href="' + productUrl(bp) + '" style="font-size:.82rem;display:block;margin-top:4px;color:var(--blue)">' + esc(loc(bp, 'name').substring(0, 35)) + '</a><button type="button" class="btn btn-primary btn-sm btn-block" data-add="' + esc(bp.sku) + '" style="margin-top:6px">' + esc(t('product.add')) + '</button></div>';
+          }).join('') + '</div>';
+        var pEl = app.querySelector('.product');
+        if (pEl) pEl.insertAdjacentElement('afterend', bundleSec);
+        bindAddButtons(bundleSec);
+      }
+      // PWA tugmasi
+      var pwaBtn = document.createElement('button');
+      pwaBtn.type = 'button'; pwaBtn.className = 'pwa-btn'; pwaBtn.setAttribute('data-pwa-install', ''); pwaBtn.hidden = true;
+      pwaBtn.innerHTML = '📱 ' + esc(lang === 'ru' ? 'Установить приложение' : "Ilovani o'rnatish");
+      pwaBtn.addEventListener('click', function () { NEWF.installPWA(); });
+      if (extraActions) extraActions.appendChild(pwaBtn);
+    }
+
     // Ko'rilgan mahsulotlar
     if (window.FEAT) {
       var recentSkus = FEAT.getRecent().filter(function (s) { return s !== p.sku; }).slice(0, 4);
@@ -1055,7 +1110,58 @@
       '<a class="btn btn-primary" href="index.html">' + esc(t('nav.home')) + '</a></div>';
   }
 
-  var PAGES = { home: pageHome, catalog: pageCatalog, product: pageProduct, cart: pageCart, about: pageAbout, wishlist: pageWishlist, compare: pageCompare, wholesale: pageWholesale, 'room-calc': pageRoomCalc, '404': page404 };
+  var PAGES = { home: pageHome, catalog: pageCatalog, product: pageProduct, cart: pageCart, about: pageAbout, wishlist: pageWishlist, compare: pageCompare, wholesale: pageWholesale, 'room-calc': pageRoomCalc, orders: pageOrders, '404': page404 };
+
+  // ========== BUYURTMALARIM ==========
+  function pageOrders(app) {
+    setMeta(lang === 'ru' ? 'Мои заказы' : 'Buyurtmalarim');
+    var orders = window.NEWF ? NEWF.getOrders() : [];
+    var statusLabels = {
+      new:        { uz: 'Yangi',       ru: 'Новый',      cls: 'status-new' },
+      processing: { uz: 'Jarayonda',   ru: 'В обработке', cls: 'status-processing' },
+      done:       { uz: 'Yetkazildi',  ru: 'Доставлен',  cls: 'status-done' },
+      cancelled:  { uz: 'Bekor',       ru: 'Отменён',    cls: 'status-cancelled' },
+    };
+    if (!orders.length) {
+      app.innerHTML = '<div class="container section center">' +
+        '<h1>' + esc(lang === 'ru' ? 'Мои заказы' : 'Buyurtmalarim') + '</h1>' +
+        '<p class="muted">' + esc(lang === 'ru' ? 'У вас пока нет заказов.' : "Hozircha buyurtmalaringiz yo'q.") + '</p>' +
+        '<a class="btn btn-primary" href="catalog.html">' + esc(t('catalog.title')) + '</a></div>';
+      return;
+    }
+    var rows = orders.map(function (o) {
+      var st = statusLabels[o.status] || statusLabels.new;
+      var date = new Date(o.date).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      var items = (o.items || []).map(function (it) {
+        var p = findProduct(it.sku);
+        return p ? loc(p, 'name') + ' × ' + it.qty : it.sku + ' × ' + it.qty;
+      }).join(', ');
+      return '<div class="order-card">' +
+        '<div class="order-card-head">' +
+          '<span class="order-id">' + esc(o.id || '') + '</span>' +
+          '<span class="order-date">' + esc(date) + '</span>' +
+          '<span class="order-status ' + st.cls + '">' + esc(lang === 'ru' ? st.ru : st.uz) + '</span>' +
+        '</div>' +
+        '<div class="order-items">' + esc(items) + '</div>' +
+        (o.total ? '<div class="order-total">' + formatPrice(o.total) + '</div>' : '') +
+      '</div>';
+    }).join('');
+    app.innerHTML = '<div class="container section">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:20px">' +
+        '<h1>' + esc(lang === 'ru' ? 'Мои заказы' : 'Buyurtmalarim') + ' (' + orders.length + ')</h1>' +
+        '<button type="button" class="link-btn" id="clear-orders">' + esc(lang === 'ru' ? 'Tarixi tozalash' : 'Tarixni tozalash') + '</button>' +
+      '</div>' +
+      '<div class="orders-list">' + rows + '</div></div>';
+    var clearBtn = $('#clear-orders');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        if (confirm(lang === 'ru' ? 'Очистить историю заказов?' : "Buyurtmalar tarixini tozalamoqchimisiz?")) {
+          try { localStorage.removeItem('asama_orders'); } catch (e) {}
+          render();
+        }
+      });
+    }
+  }
 
   // ========== SEVIMLILAR ==========
   function pageWishlist(app) {

@@ -131,12 +131,18 @@
     getCompare: getCompare,
     inCompare: inCompare,
     toggleCompare: toggleCompare,
+    saveCompare: saveCompare,
     updateCompareBadge: updateCompareBadge,
     CMP_MAX: CMP_MAX,
 
     // Ko'rilganlar
     addRecent: addRecent,
     getRecent: getRecent,
+
+    // Sevimlilar tozalash
+    clearWish: function() { saveWish([]); },
+    // Solishtirish tozalash
+    clearCompare: function() { saveCompare([]); },
 
     // Statistika
     trackVisit: trackVisit,

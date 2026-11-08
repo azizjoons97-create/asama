@@ -1,0 +1,223 @@
+/* 3-to'plam funksiyalar CSS */
+
+/* ===== TUNGI REJIM ===== */
+:root {
+  --white: #fff;
+  --bg: #f4f6fa;
+  --text: #131d2e;
+  --muted: #556070;
+  --border: #dde3ea;
+}
+html.dark {
+  --white: #1e2535;
+  --bg: #151c2a;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --border: #2d3a4f;
+  --blue-light: #1e2f4a;
+  --shadow: 0 2px 12px rgba(0,0,0,.4);
+}
+html.dark body { background: var(--bg); color: var(--text); }
+html.dark #site-header { background: #1a2236; border-color: var(--border); }
+html.dark .header-nav-bar { background: #0f1825; }
+html.dark .card, html.dark .cart-list, html.dark .order-form,
+html.dark .contact-card, html.dark .prose, html.dark .room-calc,
+html.dark .wholesale-form, html.dark .calc-box, html.dark .compare-table,
+html.dark .product { background: var(--white); border-color: var(--border); }
+html.dark .cat-tile { background: var(--white); border-color: var(--border); }
+html.dark .chip { background: var(--white); border-color: var(--border); }
+html.dark input, html.dark select, html.dark textarea { background: #151c2a; border-color: var(--border); color: var(--text); }
+html.dark #site-footer { background: #0a1120; }
+html.dark .adv-icon { background: #1e2f4a; }
+html.dark .stats-bar { background: #0f1825; }
+html.dark .card-icon-btn { background: #151c2a; border-color: var(--border); }
+html.dark .hero { background: linear-gradient(110deg, #070e1f, #0d2680 55%, #1a3a8f 100%); }
+html.dark .cta { background: #1e2f4a; border-color: var(--blue); }
+html.dark .why { background: var(--white); }
+html.dark .product-img, html.dark .card-img, html.dark .cart-img { background: #151c2a; }
+
+/* Dark mode tugmasi */
+[data-dark-btn] {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: .85rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all .18s;
+}
+[data-dark-btn]:hover { border-color: var(--blue); color: var(--blue); }
+html.dark [data-dark-btn] { border-color: #ffd700; color: #ffd700; }
+
+/* ===== AKSIYA BANNERI ===== */
+.promo-banner {
+  background: linear-gradient(90deg, #C0321A, #e84118);
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 600;
+  position: relative;
+  z-index: 200;
+}
+.banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 16px;
+  flex-wrap: wrap;
+}
+.banner-timer { opacity: .9; font-weight: 700; }
+.banner-close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  color: rgba(255,255,255,.8);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px;
+  line-height: 1;
+}
+.banner-close:hover { color: #fff; }
+
+/* ===== POPUP ===== */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fade-in .25s ease;
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.popup-box {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 32px;
+  max-width: 460px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  animation: pop-in .3s ease;
+}
+@keyframes pop-in { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.popup-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: 0;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--muted);
+  line-height: 1;
+}
+.popup-close:hover { color: var(--red); }
+
+/* ===== YULDUZ REYTINGI ===== */
+.stars { display: inline-flex; gap: 3px; }
+.star { font-size: 1.1rem; color: var(--border); transition: color .12s; cursor: default; }
+.star.on { color: #f59e0b; }
+.stars-interactive .star { cursor: pointer; }
+.stars-interactive .star:hover { color: #f59e0b; }
+.rating-saved { font-size: .82rem; color: var(--green); margin-left: 6px; display: none; }
+
+/* ===== OLDINGI BUYURTMALAR ===== */
+.orders-list { display: flex; flex-direction: column; gap: 16px; }
+.order-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.order-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.order-id { font-weight: 700; font-size: .95rem; color: var(--blue); }
+.order-date { color: var(--muted); font-size: .85rem; }
+.order-status {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: .8rem;
+  font-weight: 700;
+}
+.status-new { background: #dbeafe; color: #1e40af; }
+.status-processing { background: #fef3c7; color: #92400e; }
+.status-done { background: #d1fae5; color: #065f46; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
+.order-items { font-size: .88rem; color: var(--muted); }
+.order-total { font-weight: 700; color: var(--blue-dark); margin-top: 6px; }
+
+/* ===== SOVG'A TAKLIFI ===== */
+.bundle-section {
+  background: linear-gradient(135deg, var(--blue-light), #fff);
+  border: 1px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 16px;
+}
+.bundle-section h3 { color: var(--blue-dark); margin-bottom: 12px; }
+.bundle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.bundle-item {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  font-size: .85rem;
+}
+.bundle-item img { width: 60px; height: 60px; object-fit: contain; margin: 0 auto 6px; }
+.bundle-item strong { display: block; color: var(--blue-dark); }
+html.dark .bundle-section { background: #1e2f4a; }
+
+/* ===== PWA TUGMASI ===== */
+.pwa-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--blue);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .9rem;
+  transition: background .18s;
+}
+.pwa-btn:hover { background: var(--blue-dark); }
+
+/* ===== ULASHISH TUGMASI ===== */
+.share-product-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 14px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: .88rem;
+  transition: all .15s;
+}
+.share-product-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+@media (max-width: 600px) {
+  .popup-box { padding: 22px 18px; }
+  .bundle-grid { grid-template-columns: repeat(2, 1fr); }
+}
